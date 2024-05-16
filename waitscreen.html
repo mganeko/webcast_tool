@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Wait Screen</title>
+  <style>
+    #fullscreen_area {
+      background-color: rgb(239, 239, 239);
+      margin: 50px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  </style>
+</head>
+<!--
+  TODO:
+  - [ ] 画像ファイルを読み込み
+  - [x] テキストを打ち込み
+  - [ ] 音楽ファイルを読み込み
+    - [ ] 音楽ファイルを再生、
+  - [ ] 時計を表示
+    - [ ] テキストで表示、intervalで更新
+  - [ ] フルスクリーン表示
+-->
+
+<body>
+  <h1>waiting screen</h1>
+  <div id="controll_box">
+    <button id="start_fullscreen_button" onclick="startFullscreen()">Start Fullscreen</button>
+    &nbsp;[Esc] to exit
+    fullscreen
+    <br />
+    <input type="text" id="text_message_input" placeholder="message here">
+    <br />
+    <input type="file" id="audio_file_input" accept="audio/*" onchange="audioFileSelected()">
+    <audio id="audio" controls loop></audio>
+    <input type="checkbox" id="audio_loop_checkbox" checked onchange="audioLoopChenged()">loop</input>
+  </div>
+  <div id="fullscreen_area">
+    <canvas id="clock_canvas" width="400" height="300"></canvas>
+    <div id="text_message">
+      some text here
+    </div>
+  </div>
+</body>
+
+<script>
+  function audioLoopChenged() {
+    const audio = document.getElementById('audio');
+    const loop = document.getElementById('audio_loop_checkbox').checked;
+    audio.loop = loop; o
+  }
+
+  function audioFileSelected() {
+    const audioFile = document.getElementById('audio_file_input').files[0];
+    const audio = document.getElementById('audio');
+    audio.src = URL.createObjectURL(audioFile);
+  }
+
+  function startFullscreen() {
+    // -- for clock --
+    let keepAnimation = false;
+    const canvas = document.getElementById('clock_canvas');
+    const canvasCtx = canvas.getContext('2d');
+
+    // -- set text --
+    const text = document.getElementById('text_message_input').value;
+    const textMessage = document.getElementById('text_message');
+    textMessage.innerText = text;
+
+    // -- start fullscreen --
+    const fullscreenArea = document.getElementById('fullscreen_area');
+    fullscreenArea.requestFullscreen();
+
+    // --- start clock ---
+    keepAnimation = true;
+    requestAnimationFrame(_updateCanvas);
+
+    // -- play audio --
+    const audio = document.getElementById('audio');
+    audio.play();
+
+    // -- on exit fullscreen --
+    document.addEventListener('fullscreenchange', (event) => {
+      if (!document.fullscreenElement) {
+        console.log('exited fullscreen');
+        const audio = document.getElementById('audio');
+        audio.pause();
+
+        keepAnimation = false;
+      }
+    });
+
+    // ==============================
+
+    function _updateCanvas() {
+      const currentTime = new Date();
+      const strTime = _2digit(currentTime.getHours()) + ':' + _2digit(currentTime.getMinutes()) + ':' + _2digit(currentTime.getSeconds());
+
+      const fontHeight = Math.min(parseInt(canvas.height / 5), 120);
+      const textTop = parseInt(canvas.height / 5) * 2;
+      const textLeft = parseInt(canvas.width / 10);
+      canvasCtx.font = fontHeight + 'px serif'; //'128px serif';
+
+      canvasCtx.fillStyle = 'rgb(255,255,255)';
+      //canvasCtx.fillStyle = 'rgb(240,240,240)';
+      canvasCtx.fillRect(textLeft - 2, (textTop - fontHeight) - 2, fontHeight * 5 + 20, fontHeight + 8);
+      canvasCtx.fillStyle = 'rgb(0,0,255)';
+      canvasCtx.fillText(strTime, textLeft, textTop);
+
+      if (keepAnimation) {
+        requestAnimationFrame(_updateCanvas);
+      }
+    }
+
+    function _clearCanvas() {
+      canvasCtx.fillStyle = 'rgb(255,255,255)';
+      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function _2digit(str) {
+      return ('0' + str).slice(-2);
+    }
+  }
+
+
+
+
+</script>
+
+</html>
