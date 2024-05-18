@@ -8,8 +8,10 @@
   <style>
     #fullscreen_area {
       background-color: rgb(239, 239, 239);
+      border: 1px solid black;
       margin: 50px auto;
       display: flex;
+      flex-direction:column;
       align-items: center;
       justify-content: center;
       text-align: center;
@@ -31,24 +33,60 @@
   <h1>waiting screen</h1>
   <div id="controll_box">
     <button id="start_fullscreen_button" onclick="startFullscreen()">Start Fullscreen</button>
-    &nbsp;[Esc] to exit
-    fullscreen
+    &nbsp;[Esc] to exit fullscreen
     <br />
-    <input type="text" id="text_message_input" placeholder="message here">
+    Clock: 
+    <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
     <br />
+    Message:
+    <input type="text" id="text_message_input" size="40" placeholder="message here">
+    <br />
+    BGM:
     <input type="file" id="audio_file_input" accept="audio/*" onchange="audioFileSelected()">
     <audio id="audio" controls loop></audio>
     <input type="checkbox" id="audio_loop_checkbox" checked onchange="audioLoopChenged()">loop</input>
   </div>
   <div id="fullscreen_area">
-    <canvas id="clock_canvas" width="400" height="300"></canvas>
-    <div id="text_message">
-      some text here
+    <!--
+    <div id="image_area">
+      <img src="https://placehold.jp/400x300.png" alt="image" width="400" height="300">
+    </div>
+    -->
+    <div id="clock_text" style="font-family: 'arial black' ; font-size: 64px;" >
+      00:00:00
+    </div>
+    <div id="text_message" style="font-family: 'sans-serif' ; font-size: 64px;" >
+      ここにメッセージを表示
     </div>
   </div>
 </body>
 
 <script>
+    // ==============================
+    let _clockTimer = null;
+    function _stopClock() {
+      if (_clockTimer) {
+        clearInterval(_clockTimer);
+        _clockTimer = null;
+      }
+    }
+    
+    function _startClock() {
+      _clockTimer= setInterval(_updateClock, 1000);
+    }
+
+    function _updateClock() {
+      const currentTime = new Date();
+      const strTime = _2digit(currentTime.getHours()) + ':' + _2digit(currentTime.getMinutes()) + ':' + _2digit(currentTime.getSeconds());
+      const clockText = document.getElementById('clock_text');
+      clockText.innerText = strTime;
+    }
+
+    function _2digit(str) {
+      return ('0' + str).slice(-2);
+    }
+    // ==============================
+
   function audioLoopChenged() {
     const audio = document.getElementById('audio');
     const loop = document.getElementById('audio_loop_checkbox').checked;
@@ -62,11 +100,6 @@
   }
 
   function startFullscreen() {
-    // -- for clock --
-    let keepAnimation = false;
-    const canvas = document.getElementById('clock_canvas');
-    const canvasCtx = canvas.getContext('2d');
-
     // -- set text --
     const text = document.getElementById('text_message_input').value;
     const textMessage = document.getElementById('text_message');
@@ -77,8 +110,9 @@
     fullscreenArea.requestFullscreen();
 
     // --- start clock ---
-    keepAnimation = true;
-    requestAnimationFrame(_updateCanvas);
+    //keepAnimation = true;
+    //requestAnimationFrame(_updateCanvas);
+    _startClock();
 
     // -- play audio --
     const audio = document.getElementById('audio');
@@ -91,40 +125,9 @@
         const audio = document.getElementById('audio');
         audio.pause();
 
-        keepAnimation = false;
+        _stopClock();
       }
     });
-
-    // ==============================
-
-    function _updateCanvas() {
-      const currentTime = new Date();
-      const strTime = _2digit(currentTime.getHours()) + ':' + _2digit(currentTime.getMinutes()) + ':' + _2digit(currentTime.getSeconds());
-
-      const fontHeight = Math.min(parseInt(canvas.height / 5), 120);
-      const textTop = parseInt(canvas.height / 5) * 2;
-      const textLeft = parseInt(canvas.width / 10);
-      canvasCtx.font = fontHeight + 'px serif'; //'128px serif';
-
-      canvasCtx.fillStyle = 'rgb(255,255,255)';
-      //canvasCtx.fillStyle = 'rgb(240,240,240)';
-      canvasCtx.fillRect(textLeft - 2, (textTop - fontHeight) - 2, fontHeight * 5 + 20, fontHeight + 8);
-      canvasCtx.fillStyle = 'rgb(0,0,255)';
-      canvasCtx.fillText(strTime, textLeft, textTop);
-
-      if (keepAnimation) {
-        requestAnimationFrame(_updateCanvas);
-      }
-    }
-
-    function _clearCanvas() {
-      canvasCtx.fillStyle = 'rgb(255,255,255)';
-      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function _2digit(str) {
-      return ('0' + str).slice(-2);
-    }
   }
 
 
