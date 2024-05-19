@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width">
   <title>Wait Screen</title>
   <style>
-    #fullscreen_area {
+    #fullscreen_area_bak {
       background-color: rgb(239, 239, 239);
       border: 1px solid black;
       margin: 50px auto;
@@ -15,6 +15,41 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+    }
+
+    .container {
+      margin: 0px;
+      padding: 0px;
+      display: relative;
+      border: solid 1px blue;
+    }
+
+    .clock {
+      margin: 0px;
+      padding: 5px;
+      font-family: 'arial black';
+      font-size: 64px;
+      display: none;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      color: rgb(32, 32, 32);
+      background-color: rgba(192,192,192,0.2);
+    }
+
+    .message {
+      margin: 0px;
+      padding: 5px;
+      font-family: 'sans-serif';
+      font-size: 64px;
+      display: none;
+      position: absolute;
+      top: 30%;
+      left: 0px;
+      width: 100%;
+      text-align: center;
+      color: rgb(64, 64, 64);
+      background-color: rgba(224,224,224,0.8);
     }
   </style>
 </head>
@@ -40,7 +75,7 @@
     <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
     <br />
     Message:
-    <input type="text" id="text_message_input" size="40" placeholder="message here">
+    <input type="text" id="text_message_input" size="40" placeholder="message here" value="Wait a minute, please.">
     <br />
     Image: <input type="file" id="image_file_input" accept="image/*" onchange="imageFileSelected()">
     <br />
@@ -49,34 +84,38 @@
     <audio id="audio" controls loop></audio>
     <input type="checkbox" id="audio_loop_checkbox" checked onchange="audioLoopChenged()">loop</input>
   </div>
-  <div id="fullscreen_area">
+  <div id="fullscreen_area" class="container">
     <!--
     <div id="image_area">
       <img src="https://placehold.jp/400x300.png" alt="image" width="400" height="300">
     </div>
     -->
-    <div id="clock_text" style="font-family: 'arial black' ; font-size: 64px;" >
+    <p id="clock_text" class="clock">
       00:00:00
-    </div>
-    <div id="text_message" style="font-family: 'sans-serif' ; font-size: 64px;" >
+    </p>
+    <p id="text_message" class="message" >
       ここにメッセージを表示
-    </div>
-    <img id="image_area" src="https://placehold.jp/960x540.png" alt="image" size="960" width="540"></img>
+    </p>
+    <img id="image_area" src="https://placehold.jp/960x540.png" alt="image" width="100%"></img>
   </div>
 </body>
 
 <script>
-    // ==============================
+    // ========== clock ====================
     let _clockTimer = null;
     function _stopClock() {
       if (_clockTimer) {
         clearInterval(_clockTimer);
         _clockTimer = null;
       }
+      const clockText = document.getElementById('clock_text');
+      clockText.style.display = 'none';
     }
     
     function _startClock() {
       _clockTimer= setInterval(_updateClock, 1000);
+      const clockText = document.getElementById('clock_text');
+      clockText.style.display = 'block';
     }
 
     function _updateClock() {
@@ -89,7 +128,22 @@
     function _2digit(str) {
       return ('0' + str).slice(-2);
     }
-    // ==============================
+    // =========== clock ===================
+
+    // =========== message ===================
+    function _showMessage() {
+      const text = document.getElementById('text_message_input').value;
+      const textMessage = document.getElementById('text_message');
+      textMessage.innerText = text;
+      textMessage.style.display = 'block';
+    }
+
+    function _hideMessage() {
+      const textMessage = document.getElementById('text_message');
+      textMessage.style.display = 'none';
+    }
+
+    // =========== message ===================
 
   function audioLoopChenged() {
     const audio = document.getElementById('audio');
@@ -124,6 +178,9 @@
     //requestAnimationFrame(_updateCanvas);
     _startClock();
 
+    // -- show message --
+    _showMessage();
+
     // -- play audio --
     const audio = document.getElementById('audio');
     audio.play();
@@ -135,6 +192,7 @@
         const audio = document.getElementById('audio');
         audio.pause();
 
+        _hideMessage();
         _stopClock();
       }
     });
