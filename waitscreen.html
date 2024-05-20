@@ -20,7 +20,10 @@
     .container {
       margin: 0px;
       padding: 0px;
-      display: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
       border: solid 1px blue;
     }
 
@@ -45,24 +48,26 @@
       display: none;
       position: absolute;
       top: 30%;
-      left: 0px;
-      width: 100%;
       text-align: center;
       color: rgb(64, 64, 64);
-      background-color: rgba(224, 224, 224, 0.8);
+      background-color: rgba(240, 240, 240, 0.8);
     }
   </style>
 </head>
 <!--
   TODO:
-  - [ ] 画像ファイルを読み込み
-    - [ ] 画像を表示
+  - [x] 画像ファイルを読み込み
+    - [x] 画像を表示
   - [x] テキストを打ち込み
   - [x] 音楽ファイルを読み込み
     - [x] 音楽ファイルを再生、
   - [x] 時計を表示
     - [x] テキストで表示、intervalで更新
   - [x] フルスクリーン表示
+  - [ ] レイアウト調整
+    - [ ] 時計の位置
+    - [ ] テキストの位置
+    - [ ] テキスト複数行
 -->
 
 <body>
@@ -75,7 +80,7 @@
     <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
     <br />
     Message:
-    <input type="text" id="text_message_input" size="40" placeholder="message here" value="Wait a minute, please.">
+    <input type="text" id="text_message_input" size="40" placeholder="message here" value="">
     <br />
     Image: <input type="file" id="image_file_input" accept="image/*" onchange="imageFileSelected()">
     <br />
@@ -135,6 +140,10 @@
   // =========== clock ===================
 
   // =========== message ===================
+  function _isShowMessage() {
+    return document.getElementById('text_message_input').value.length > 0;
+  }
+
   function _showMessage() {
     const text = document.getElementById('text_message_input').value;
     const textMessage = document.getElementById('text_message');
@@ -209,7 +218,9 @@
     }
 
     // -- show message --
-    _showMessage();
+    if (_isShowMessage()) {
+      _showMessage();
+    }
 
     // -- play audio --
     _playAudio();
