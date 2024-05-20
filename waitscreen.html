@@ -11,7 +11,7 @@
       border: 1px solid black;
       margin: 50px auto;
       display: flex;
-      flex-direction:column;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
@@ -34,12 +34,12 @@
       top: 8px;
       right: 8px;
       color: rgb(32, 32, 32);
-      background-color: rgba(192,192,192,0.2);
+      background-color: rgba(192, 192, 192, 0.2);
     }
 
     .message {
       margin: 0px;
-      padding: 5px;
+      padding: 10px;
       font-family: 'sans-serif';
       font-size: 64px;
       display: none;
@@ -49,7 +49,7 @@
       width: 100%;
       text-align: center;
       color: rgb(64, 64, 64);
-      background-color: rgba(224,224,224,0.8);
+      background-color: rgba(224, 224, 224, 0.8);
     }
   </style>
 </head>
@@ -71,7 +71,7 @@
     <button id="start_fullscreen_button" onclick="startFullscreen()">Start Fullscreen</button>
     &nbsp;[Esc] to exit fullscreen
     <br />
-    Clock: 
+    Clock:
     <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
     <br />
     Message:
@@ -93,7 +93,7 @@
     <p id="clock_text" class="clock">
       00:00:00
     </p>
-    <p id="text_message" class="message" >
+    <p id="text_message" class="message">
       ここにメッセージを表示
     </p>
     <img id="image_area" src="https://placehold.jp/960x540.png" alt="image" width="100%"></img>
@@ -101,49 +101,77 @@
 </body>
 
 <script>
-    // ========== clock ====================
-    let _clockTimer = null;
-    function _stopClock() {
-      if (_clockTimer) {
-        clearInterval(_clockTimer);
-        _clockTimer = null;
-      }
-      const clockText = document.getElementById('clock_text');
-      clockText.style.display = 'none';
+  // ========== clock ====================
+  let _clockTimer = null;
+  function _stopClock() {
+    if (_clockTimer) {
+      clearInterval(_clockTimer);
+      _clockTimer = null;
     }
-    
-    function _startClock() {
-      _clockTimer= setInterval(_updateClock, 1000);
-      const clockText = document.getElementById('clock_text');
-      clockText.style.display = 'block';
-    }
+    const clockText = document.getElementById('clock_text');
+    clockText.style.display = 'none';
+  }
 
-    function _updateClock() {
-      const currentTime = new Date();
-      const strTime = _2digit(currentTime.getHours()) + ':' + _2digit(currentTime.getMinutes()) + ':' + _2digit(currentTime.getSeconds());
-      const clockText = document.getElementById('clock_text');
-      clockText.innerText = strTime;
-    }
+  function _startClock() {
+    _clockTimer = setInterval(_updateClock, 1000);
+    const clockText = document.getElementById('clock_text');
+    clockText.style.display = 'block';
+  }
 
-    function _2digit(str) {
-      return ('0' + str).slice(-2);
-    }
-    // =========== clock ===================
+  function _updateClock() {
+    const currentTime = new Date();
+    const strTime = _2digit(currentTime.getHours()) + ':' + _2digit(currentTime.getMinutes()) + ':' + _2digit(currentTime.getSeconds());
+    const clockText = document.getElementById('clock_text');
+    clockText.innerText = strTime;
+  }
 
-    // =========== message ===================
-    function _showMessage() {
-      const text = document.getElementById('text_message_input').value;
-      const textMessage = document.getElementById('text_message');
-      textMessage.innerText = text;
-      textMessage.style.display = 'block';
-    }
+  function _2digit(str) {
+    return ('0' + str).slice(-2);
+  }
 
-    function _hideMessage() {
-      const textMessage = document.getElementById('text_message');
-      textMessage.style.display = 'none';
-    }
+  function _isShowClock() {
+    return document.getElementById('show_clock_checkbox').checked;
+  }
+  // =========== clock ===================
 
-    // =========== message ===================
+  // =========== message ===================
+  function _showMessage() {
+    const text = document.getElementById('text_message_input').value;
+    const textMessage = document.getElementById('text_message');
+    textMessage.innerText = text;
+    textMessage.style.display = 'block';
+  }
+
+  function _hideMessage() {
+    const textMessage = document.getElementById('text_message');
+    textMessage.style.display = 'none';
+  }
+
+  // =========== message ===================
+
+
+  // =========== audio ===================
+
+  function _isAudioPlaying() {
+    const audio = document.getElementById('audio');
+    return (audio.duration > 0) && (!audio.paused);
+  }
+
+  function _playAudio() {
+    const audio = document.getElementById('audio');
+    audio.play();
+  }
+
+  function _pauseAudio() {
+    if (!_isAudioPlaying()) {
+      return;
+    }
+    const audio = document.getElementById('audio');
+    audio.pause();
+  }
+
+  // =========== audio ===================
+
 
   function audioLoopChenged() {
     const audio = document.getElementById('audio');
@@ -176,21 +204,21 @@
     // --- start clock ---
     //keepAnimation = true;
     //requestAnimationFrame(_updateCanvas);
-    _startClock();
+    if (_isShowClock()) {
+      _startClock();
+    }
 
     // -- show message --
     _showMessage();
 
     // -- play audio --
-    const audio = document.getElementById('audio');
-    audio.play();
+    _playAudio();
 
     // -- on exit fullscreen --
     document.addEventListener('fullscreenchange', (event) => {
       if (!document.fullscreenElement) {
         console.log('exited fullscreen');
-        const audio = document.getElementById('audio');
-        audio.pause();
+        _pauseAudio();
 
         _hideMessage();
         _stopClock();
