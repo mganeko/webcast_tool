@@ -52,6 +52,15 @@
       color: rgb(64, 64, 64);
       background-color: rgba(240, 240, 240, 0.8);
     }
+
+    #controll_box {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+    }
+
+    .label {
+      text-align: right;
+    }
   </style>
 </head>
 <!--
@@ -74,20 +83,31 @@
   <h1>waiting screen</h1>
   <div id="controll_box">
     <button id="start_fullscreen_button" onclick="startFullscreen()">Start Fullscreen</button>
-    &nbsp;[Esc] to exit fullscreen
-    <br />
-    Clock:
-    <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
-    <br />
-    Message:
-    <input type="text" id="text_message_input" size="40" placeholder="message here" value="">
-    <br />
-    Image: <input type="file" id="image_file_input" accept="image/*" onchange="imageFileSelected()">
-    <br />
-    BGM:
-    <input type="file" id="audio_file_input" accept="audio/*" onchange="audioFileSelected()">
-    <audio id="audio" controls loop></audio>
-    <input type="checkbox" id="audio_loop_checkbox" checked onchange="audioLoopChenged()">loop</input>
+    <span>&nbsp;[Esc] to exit fullscreen</span>
+    <span>&nbsp;</span><span>&nbsp;</span>
+
+    <span class="label"> Clock: </span>
+    <div>
+      <input type="checkbox" id="show_clock_checkbox" checked>show Clock</input>
+    </div>
+
+    <span class="label">Message:</span>
+    <div>
+      <input type="text" id="text_message_input" size="40" placeholder="message here" value="">
+      <span>&nbsp</span>
+    </div>
+
+    <span class="label">Image:</span>
+    <input type="file" id="image_file_input" accept="image/*" onchange="imageFileSelected()">
+
+    <div style="display:flex; justify-content: right; align-items: center;">
+      <span>BGM:</span>
+    </div>
+    <div style="display:flex; align-items: center;">
+      <input type="file" id="audio_file_input" accept="audio/*" onchange="audioFileSelected()">
+      <audio id="audio" controls loop></audio>
+      <input type="checkbox" id="audio_loop_checkbox" checked onchange="audioLoopChenged()">loop</input>
+    </div>
   </div>
   <div id="fullscreen_area" class="container">
     <!--
