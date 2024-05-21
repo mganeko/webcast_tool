@@ -185,13 +185,14 @@
   function audioLoopChenged() {
     const audio = document.getElementById('audio');
     const loop = document.getElementById('audio_loop_checkbox').checked;
-    audio.loop = loop; o
+    audio.loop = loop;
   }
 
   function audioFileSelected() {
     const audioFile = document.getElementById('audio_file_input').files[0];
     const audio = document.getElementById('audio');
     audio.src = URL.createObjectURL(audioFile);
+    audio.volume = 0.2;
   }
 
   function imageFileSelected() {
